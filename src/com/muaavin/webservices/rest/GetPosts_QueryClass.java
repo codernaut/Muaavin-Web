@@ -121,9 +121,9 @@ public class GetPosts_QueryClass {
 	@Produces(MediaType.APPLICATION_JSON)
 	public void deletePosts(@QueryParam("Post_id") String Post_id, @QueryParam("Group_name") String group_name, @QueryParam("User_id") String user_id, @QueryParam("isPostOfSpecificUser") boolean isPostOfSpecificUser) throws Exception
 	{
-		Post_id = AesEncryption.decrypt(Post_id);
-		group_name = AesEncryption.decrypt(group_name);
-		user_id = AesEncryption.decrypt(user_id);
+		if(Post_id!=null) Post_id = AesEncryption.decrypt(Post_id);
+		if(group_name!=null) group_name = AesEncryption.decrypt(group_name);
+		if(user_id!=null) user_id = AesEncryption.decrypt(user_id);
 		
 		
 		MySqlDb Db = new MySqlDb();
@@ -228,6 +228,8 @@ public class GetPosts_QueryClass {
 			 
 			 sql = "delete from Posts_Comments_Table where  Post_ID = '"+Post_id+"';"; 
 			 st.executeUpdate(sql);
+			 
+			 System.out.println("Post Deleted.");
 		}
 		
 	}
