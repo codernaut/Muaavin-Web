@@ -28,15 +28,15 @@ import com.mysql.jdbc.ResultSet;
 @Path("/Users") 
 public class UserQueryClass {
 	
-	List<InfringingUser> users = new ArrayList<>();
-	List<InfringingUser> infringing_users = new ArrayList<>();
+	List<User> users = new ArrayList<>();
+	List<User> infringing_users = new ArrayList<>();
 	
 	@POST
 	@Path("/GetUsers")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getUsers() throws Exception
 	{
-		users = new ArrayList<InfringingUser>();
+		users = new ArrayList<User>();
 		MySqlDb db = new MySqlDb();
 		Connection conn = db.connect();
 		Statement st = conn.createStatement();
@@ -46,7 +46,7 @@ public class UserQueryClass {
 		    
 		while(rs.next()) 
 		{ 
-		   InfringingUser user = InfringingUser.initializeUser(rs.getString("name"), rs.getString("id"), rs.getString("profilePic"),rs.getString("state")); 		    	  
+		   User user = User.initializeUser(rs.getString("name"), rs.getString("id"), rs.getString("profilePic"),rs.getString("state")); 		    	  
 		   users.add(user); 
 		}    	
 		return AesEncryption.encrypt(users.toString());	
@@ -90,7 +90,7 @@ public class UserQueryClass {
 		users = new ArrayList<>();
 		while(rs.next()) 
 		{  		   
-		   InfringingUser user = InfringingUser.initializeUser("", rs.getString("User_ID"), "","");	   
+		   User user = User.initializeUser("", rs.getString("User_ID"), "","");	   
 		   users.add(user);
 		}	
 		return users.toString();
@@ -162,7 +162,7 @@ public class UserQueryClass {
 		
 		while(rs.next())
 		{	
-			InfringingUser user = InfringingUser.initializeUser(rs.getString("Name") ,rs.getString("User_ID") , rs.getString("Profile_pic"),rs.getString("state"));
+			User user = User.initializeUser(rs.getString("Name") ,rs.getString("User_ID") , rs.getString("Profile_pic"),rs.getString("state"));
 			infringing_users.add(user);					 
 		}
 		System.out.println("QUERY SUCCESSFULL EXECUTED");
