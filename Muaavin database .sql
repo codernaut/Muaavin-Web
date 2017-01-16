@@ -50,3 +50,22 @@ where state = 'Blocked'
 union
 select id from users
 where state = 'Blocked';
+
+
+create table TwitterUsers(id varchar(100) not null,name varchar(100) not null, profilePic varchar(1000) not null, state varchar(100) not null , PRIMARY KEY(id), type varchar(100) not null );
+create table TweetTable(TweetID varchar(100) not null,message varchar(1000) , ImageUrl varchar(1000) ,User_ID varchar(100) not null,Infringing_User_ID varchar(100) not null,Group_Name varchar(100) not null, PRIMARY KEY(TweetID, Group_Name,User_ID ));
+
+CREATE VIEW  TwitterInfringingUsers AS
+select distinct TwitterUsers.id , TwitterUsers.name , TwitterUsers.profilePic, TwitterUsers.state , TweetTable.Group_Name , TweetTable.User_ID 
+from TweetTable, TwitterUsers 
+where TweetTable.Infringing_User_ID =TwitterUsers.id;
+
+Create View  FacebookInfringingUsers AS
+select distinct infringingUsers.User_ID as id,infringingUsers.Name as name, infringingUsers.Profile_pic as profilePic ,groupTable.name as Group_Name ,infringingUsers.state  from groupTable,infringingUsers where groupTable.id=infringingUsers.Group_ID ;
+
+Create view FacebookTwitterInfringingUsers AS
+select distinct id ,name , profilePic,Group_Name ,state
+from TwitterInfringingUsers
+union
+select  id, name,profilePic, Group_Name ,state
+from  FacebookInfringingUsers;

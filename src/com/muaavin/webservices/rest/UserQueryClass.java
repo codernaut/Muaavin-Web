@@ -28,15 +28,15 @@ import com.mysql.jdbc.ResultSet;
 @Path("/Users") 
 public class UserQueryClass {
 	
-	List<InfringingUser> users = new ArrayList<>();
-	List<InfringingUser> infringing_users = new ArrayList<>();
+	List<User> users = new ArrayList<>();
+	List<User> infringing_users = new ArrayList<>();
 	
 	@POST
 	@Path("/GetUsers")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getUsers() throws Exception
 	{
-		users = new ArrayList<InfringingUser>();
+		users = new ArrayList<User>();
 		MySqlDb db = new MySqlDb();
 		Connection conn = db.connect();
 		Statement st = conn.createStatement();
@@ -46,7 +46,7 @@ public class UserQueryClass {
 		    
 		while(rs.next()) 
 		{ 
-		   InfringingUser user = InfringingUser.initializeUser(rs.getString("name"), rs.getString("id"), rs.getString("profilePic"),rs.getString("state")); 		    	  
+		   User user = User.initializeUser(rs.getString("name"), rs.getString("id"), rs.getString("profilePic"),rs.getString("state"),false); 		    	  
 		   users.add(user); 
 		}    	
 		return AesEncryption.encrypt(users.toString());	
@@ -55,7 +55,7 @@ public class UserQueryClass {
 	@POST
 	@Path("/BlockUser")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String BlockUser(@QueryParam("user_id") String user_id) throws Exception
+	public String BlockUser(@QueryParam("user_id") String user_id, @QueryParam("isTwitterUser") boolean isTwitterUser) throws Exception
 	{
 		user_id = AesEncryption.decrypt(user_id);
 		MySqlDb Db = new MySqlDb();
@@ -64,13 +64,19 @@ public class UserQueryClass {
 		Statement st = conn.createStatement();
 		String sql = "select* from BlockedUsers;";
 		ResultSet rs = (ResultSet) st.executeQuery(sql);
-		if(isUserAlreadyBlocked(rs, user_id)== true)
-		return "User Already Blocked";
-			
-	    st.executeUpdate("UPDATE infringingUsers SET state ='Blocked' where User_ID = '"+user_id+"';");
-	    st.executeUpdate("UPDATE Users SET state ='Blocked' where id = '"+user_id+"';");
-		String response = "User Successfully Blocked"; 
-		return AesEncryption.encrypt(response);
+		//if(isUserAlreadyBlocked(rs, user_id)== true)
+		//return "User Already Blocked";
+		if(isTwitterUser)	
+		{
+			st.executeUpdate("UPDATE TwitterUsers SET state ='Blocked' where User_ID = '"+user_id+"';");
+			return AesEncryption.encrypt("User Successfully Blocked");
+		}
+		else
+		{
+			st.executeUpdate("UPDATE infringingUsers SET state ='Blocked' where User_ID = '"+user_id+"';");
+			st.executeUpdate("UPDATE Users SET state ='Blocked' where id = '"+user_id+"';");
+			return AesEncryption.encrypt("User Successfully Blocked");
+		}
 
 	}
 	
@@ -85,15 +91,16 @@ public class UserQueryClass {
 		return false;
 	}
 	
-	public String getBlockedUsersList(ResultSet rs) throws SQLException // Get List of Blocked Users
+	public List<User> getBlockedUsersList(ResultSet rs ,List<User> Users) throws SQLException // Get List of Blocked Users
 	{
-		users = new ArrayList<>();
+		users = Users;
 		while(rs.next()) 
 		{  		   
-		   InfringingUser user = InfringingUser.initializeUser("", rs.getString("User_ID"), "","");	   
+		   User user = User.initializeUser("", rs.getString("User_ID"), "","",false);	   
 		   users.add(user);
 		}	
-		return users.toString();
+		//return users.toString() ;
+		return users;
 	}
 	
 	@POST
@@ -124,29 +131,37 @@ public class UserQueryClass {
 		Connection conn = Db.connect();
 		Statement st = conn.createStatement();
 		ResultSet rs = (ResultSet) st.executeQuery("select* from BlockedUsers;");
-		String JsonResponseUsers = getBlockedUsersList(rs);
+		String JsonResponseUsers = getBlockedUsersList(rs,new ArrayList<User>()).toString();
 		return AesEncryption.encrypt(JsonResponseUsers);
 	}
 	@POST
 	@Path("/UnBlockUser")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String UnBlockUser(@QueryParam("user_id") String user_id) throws Exception
+	public String UnBlockUser(@QueryParam("user_id") String user_id, @QueryParam("isTwitterUser") boolean isTwitterUser) throws Exception
 	{
 		user_id = AesEncryption.decrypt(user_id);
 		MySqlDb Db = new MySqlDb();
 		Connection conn = Db.connect();
 		Statement st = conn.createStatement();
-	    st.executeUpdate("UPDATE infringingUsers SET state ='UnBlocked' where User_ID = '"+user_id+"';");
-	    st.executeUpdate("UPDATE Users SET state ='UnBlocked' where id = '"+user_id+"';");
-	    System.out.println("User unBlocked");
-		return AesEncryption.encrypt("User Unblocked");
+		if(isTwitterUser)
+		{
+			st.executeUpdate("UPDATE TwitterUsers SET state ='UnBlocked' where User_ID = '"+user_id+"';");
+			return AesEncryption.encrypt("User Unblocked");
+		}
+		else 
+		{
+			st.executeUpdate("UPDATE infringingUsers SET state ='UnBlocked' where User_ID = '"+user_id+"';");
+			st.executeUpdate("UPDATE Users SET state ='UnBlocked' where id = '"+user_id+"';");
+			System.out.println("User unBlocked"); return AesEncryption.encrypt("User Unblocked");
+		}
 	}
 	////////////////////////////////////////////////////////////////////////////
 	@POST
 	@Path("/Highlights")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String get_InfringingUsers(@QueryParam("name") String Group_name ,@QueryParam("user_id") String user_id ,@QueryParam("specificUserFriends") boolean specificUserFriends) throws Exception
+	public String get_InfringingUsers(@QueryParam("name") String Group_name ,@QueryParam("user_id") String user_id ,@QueryParam("specificUserFriends") boolean specificUserFriends , @QueryParam("isTwitterData") boolean getTwitterData) throws Exception
 	{
+		System.out.println("getTwitterData "+getTwitterData);
 		if(Group_name!=null) {Group_name = AesEncryption.decrypt(Group_name); }
 		if(user_id!=null) {user_id = AesEncryption.decrypt(user_id); }
 		
@@ -157,14 +172,16 @@ public class UserQueryClass {
 		ResultSet rs = null;
 		
 		if(Group_name == null) { response = "No Parameters Passed.."; }
-		if(specificUserFriends == false) { rs = getAllInfringingUsersFromDB(Group_name,st,rs ) ;}
-		else { rs = getInfringingUsersFromDB(Group_name,user_id,st,rs ); }
-		
-		while(rs.next())
-		{	
-			InfringingUser user = InfringingUser.initializeUser(rs.getString("Name") ,rs.getString("User_ID") , rs.getString("Profile_pic"),rs.getString("state"));
-			infringing_users.add(user);					 
+		if(specificUserFriends == false) 
+		{ 
+			getAllInfringingUsersFromDB(Group_name,  st, rs);
 		}
+		else
+		{ 
+			rs = getInfringingUsersFromDB(Group_name,user_id,st,rs,getTwitterData );
+			getTwitterAndFacebookUsersFromDB(rs,getTwitterData,getTwitterData);
+		}
+		
 		System.out.println("QUERY SUCCESSFULL EXECUTED");
 		conn.close();
 		return AesEncryption.encrypt(infringing_users.toString());
@@ -173,46 +190,99 @@ public class UserQueryClass {
 	@POST
 	@Path("/UnReportUser")
 	@Produces(MediaType.APPLICATION_JSON)
-	public void UnReportUsers(@QueryParam("user_id") String User_ID) throws Exception
+	public void UnReportUsers(@QueryParam("user_id") String User_ID,@QueryParam("isTwitterData") boolean isTwitterData) throws Exception
 	{
 		User_ID = AesEncryption.decrypt(User_ID);
 		MySqlDb db = new MySqlDb();
 		Connection conn = db.connect();
 		Statement st = conn.createStatement();
-		deleteInfringingUserFromDB(User_ID, st );
+		deleteInfringingUserFromDB(User_ID, st, isTwitterData );
 		conn.close();	
+		System.out.print("isTwitterData :"+isTwitterData);
 	}
 	/////////// Get All InfringingUsers From DB
 	public ResultSet getAllInfringingUsersFromDB(String Group_name, Statement st, ResultSet rs ) throws SQLException
 	{
 		
-		if(Group_name.equals("All")){
-			rs = (ResultSet) st.executeQuery("select distinct(infringingUsers.User_ID) ,infringingUsers.Name, infringingUsers.Profile_pic ,infringingUsers.state from groupTable,infringingUsers where groupTable.id=infringingUsers.Group_ID ;");
+		if(Group_name.equals("All"))
+		{ 
+			rs = (ResultSet) st.executeQuery("select distinct id as User_ID, name as Name, profilePic as Profile_pic, state from TwitterInfringingUsers;"); 
+			getTwitterAndFacebookUsersFromDB(rs , false,true);
+			rs = (ResultSet) st.executeQuery("select distinct id as User_ID, name as Name, profilePic as Profile_pic, state from FacebookInfringingUsers;"); 
+			getTwitterAndFacebookUsersFromDB(rs , false,false);
+			System.out.print("Get All infringing Users Function Group Name : All");
 		}
-		else{
-			rs = (ResultSet) st.executeQuery("select distinct(infringingUsers.User_ID), infringingUsers.Name,  infringingUsers.Profile_pic, infringingUsers.state  from groupTable,infringingUsers where groupTable.id=infringingUsers.Group_ID and groupTable.name='"+Group_name+"';");
+			
+		else
+		{
+			rs = (ResultSet) st.executeQuery("select distinct id as User_ID , name as Name, profilePic as Profile_pic, state from TwitterInfringingUsers where Group_Name = '"+Group_name+"';");
+			getTwitterAndFacebookUsersFromDB(rs , false,true);
+			rs = (ResultSet) st.executeQuery("select distinct id as User_ID , name as Name, profilePic as Profile_pic, state from FacebookInfringingUsers where Group_Name = '"+Group_name+"';");
+			getTwitterAndFacebookUsersFromDB(rs , false,false);
+			System.out.print("Get All infringing Users Function Group Name : Specific");
 		}	
 		return rs;	
 	}
 	
 	// Get Selective InfringingUsers From DB
-	public ResultSet getInfringingUsersFromDB(String Group_name, String user_id ,Statement st, ResultSet rs ) throws SQLException
+	public ResultSet getInfringingUsersFromDB(String Group_name, String user_id ,Statement st, ResultSet rs, boolean isTwitterData ) throws SQLException
 	{
-		if(Group_name.equals("All")){
-			rs = (ResultSet) st.executeQuery("select distinct(infringingUsers.User_ID) ,infringingUsers.Name, infringingUsers.Profile_pic ,infringingUsers.state from groupTable,infringingUsers where groupTable.id=infringingUsers.Group_ID and infringingUsers.state = 'UnBlocked' and infringingUsers.Profile_Name = '"+user_id+"';");
+		if(isTwitterData)
+		{
+			if(Group_name.equals("All"))
+			{
+				rs = (ResultSet) st.executeQuery("select distinct id, name , profilePic ,state from TwitterInfringingUsers where User_ID = '"+user_id+"';");
+			}
+			else
+			{	
+				rs = (ResultSet) st.executeQuery("select distinct id, name , profilePic, state from TwitterInfringingUsers where Group_Name = '"+Group_name+"' and User_ID = '"+user_id+"';");
+			}	
 		}
-		else{
-			rs = (ResultSet) st.executeQuery("select distinct(infringingUsers.User_ID), infringingUsers.Name,  infringingUsers.Profile_pic, infringingUsers.state  from groupTable,infringingUsers where groupTable.id=infringingUsers.Group_ID and infringingUsers.state = 'UnBlocked' and infringingUsers.Profile_Name ='"+user_id+"' and groupTable.name='"+Group_name+"';");
-		}	
+		else
+		{
+			if(Group_name.equals("All"))
+			{
+				rs = (ResultSet) st.executeQuery("select distinct(infringingUsers.User_ID) ,infringingUsers.Name, infringingUsers.Profile_pic ,infringingUsers.state from groupTable,infringingUsers where groupTable.id=infringingUsers.Group_ID and infringingUsers.state = 'UnBlocked' and infringingUsers.Profile_Name = '"+user_id+"';");
+			}
+			else
+			{
+				rs = (ResultSet) st.executeQuery("select distinct(infringingUsers.User_ID), infringingUsers.Name,  infringingUsers.Profile_pic, infringingUsers.state  from groupTable,infringingUsers where groupTable.id=infringingUsers.Group_ID and infringingUsers.state = 'UnBlocked' and infringingUsers.Profile_Name ='"+user_id+"' and groupTable.name='"+Group_name+"';");
+			}	
+		}
 		return rs;	
 	}
 	// Delete InfringingUsers From DB
-	public void deleteInfringingUserFromDB(String UserID , Statement st) throws SQLException
+	public void deleteInfringingUserFromDB(String UserID , Statement st, boolean isTwitterData) throws SQLException
 	{
-		
-		st.executeUpdate("delete from postTable where id in (select Post_ID from infringingUsers where Post_ID in (select DISTINCT(Post_ID) from infringingUsers where User_ID = '"+UserID+"') group by Post_ID having COUNT(DISTINCT User_ID) = 1);");	
-		st.executeUpdate("delete from posts_comments_table where Post_ID in (select Post_ID from infringingUsers where Post_ID in (select DISTINCT(Post_ID) from infringingUsers where User_ID = '"+UserID+"') group by Post_ID having COUNT(DISTINCT User_ID) = 1);");	
-		st.executeUpdate("delete from infringingUsers where User_ID = '"+UserID+"';");
+		if(isTwitterData)
+		{
+			st.executeUpdate(" delete from TweetTable where Infringing_User_ID = '"+UserID+"';");
+			st.executeUpdate(" UPDATE  TwitterUsers SET type = 'NonInfringing' where id = '"+UserID+"';");	 
+		}
+		else
+		{
+			st.executeUpdate("delete from postTable where id in (select Post_ID from infringingUsers where Post_ID in (select DISTINCT(Post_ID) from infringingUsers where User_ID = '"+UserID+"') group by Post_ID having COUNT(DISTINCT User_ID) = 1);");	
+			st.executeUpdate("delete from posts_comments_table where Post_ID in (select Post_ID from infringingUsers where Post_ID in (select DISTINCT(Post_ID) from infringingUsers where User_ID = '"+UserID+"') group by Post_ID having COUNT(DISTINCT User_ID) = 1);");	
+			st.executeUpdate("delete from infringingUsers where User_ID = '"+UserID+"';");
+		}
+	}
+	
+	
+	public void getTwitterAndFacebookUsersFromDB(ResultSet rs , boolean getTwitterData , boolean twitterData) throws SQLException
+	{
+		while(rs.next())
+		{	
+			if(getTwitterData == true)
+			{
+				User user = User.initializeUser(rs.getString("name") ,rs.getString("id") , rs.getString("profilePic"),rs.getString("state"),true);
+				infringing_users.add(user);
+			}
+			else 
+			{
+				User user = User.initializeUser(rs.getString("Name") ,rs.getString("User_ID") , rs.getString("Profile_pic"),rs.getString("state"),twitterData);
+				infringing_users.add(user);
+			}
+		}
 	}
 	
 	

@@ -60,7 +60,7 @@ public class UsersPosts {
 				 rs = (ResultSet) st.executeQuery(sql);
 			 }
 			 else if(Group_name.equals("All")){
-				 String sql  = "select distinct  id  , post_Detail , Post_Image from postTable where  User_ID = '"+user_id+"';";
+				 String sql  = "select distinct(id)  , post_Detail , Post_Image from postTable where  User_ID = '"+user_id+"';";
 				 rs = (ResultSet) st.executeQuery(sql);
 			 }
 		}
