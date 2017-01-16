@@ -41,31 +41,23 @@ public class GetPosts_QueryClass {
 		
 			 if(Group_name.equals("All"))
 			 {
-
-				
-				String sql = "select * from GroupAll_postDetail ;";
+				String sql = "select  * from GroupAll_postDetail ;";
 				rs = (ResultSet) st.executeQuery(sql);
-				 
-				 
 			 }
 			 
 			 else if(Group_name.equals("A"))
 			 {
-
-				
-				String sql = "select * from GroupA_postDetail ;";
-				rs = (ResultSet) st.executeQuery(sql);
-				 
-				 
+				String sql = "select  * from GroupA_postDetail ;";
+				rs = (ResultSet) st.executeQuery(sql);			 
 			 }
-			
+			 
 			 else if(Group_name.equals("B")){
-				 String sql = "select * from GroupB_postDetail ;";
+				 String sql = "select  * from GroupB_postDetail ;";
 				 rs = (ResultSet) st.executeQuery(sql);
 			 }
 			 
 			 else if(Group_name.equals("C")){
-				 String sql = "select * from GroupC_postDetail ;";
+				 String sql = "select  * from GroupC_postDetail ;";
 				 rs = (ResultSet) st.executeQuery(sql);
 			 }
 			 
