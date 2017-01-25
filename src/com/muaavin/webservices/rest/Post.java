@@ -39,12 +39,14 @@ public class Post {
 	@XmlElement(name="unlike_value")
 	int unlike_value;
 	
+	@XmlElement(name="FeedBackMessage")
+	String FeedBackMessage;
+	
+	@XmlElement(name="IsTwitterPost")
+	boolean IsTwitterPost;
 
 	
-	public Post(){        
-    }
-	
-	public Post(String post_id, String post_detail,String Post_Image,String Parent_CommentID,String infringingUser_name,String infringUser_ProfilePic,String CommentID,String Comment , int unlike_value) {
+	public Post(String post_id, String post_detail,String Post_Image,String Parent_CommentID,String infringingUser_name,String infringUser_ProfilePic,String CommentID,String Comment , int unlike_value , String feedBackMessage,boolean isTwitterPost) {
 		Post_ID = post_id;
 		Post_Detail = post_detail;
 		this.Post_Image = Post_Image;
@@ -54,17 +56,20 @@ public class Post {
 		this.CommentID = CommentID;
 		this.Comment = Comment;
 		this.unlike_value = unlike_value;
+		FeedBackMessage = feedBackMessage;
+		IsTwitterPost = isTwitterPost;
 		
 		isOnlyPostDetail = false;
 		
     } 
 	
-	public Post( String post_detail , String post_id, String post_image) {
+	public Post( String post_detail , String post_id, String post_image, boolean isTwitterPost) {
 		
 		Post_Detail = post_detail;	
 		Post_ID = post_id;
 		isOnlyPostDetail = true;
 		Post_Image = post_image;
+		IsTwitterPost = isTwitterPost;
 		
     } 
 	
@@ -86,6 +91,8 @@ public class Post {
 	        	jobj.put("Post_Image", Post_Image); //Post_Image
 	        	jobj.put("infringingUser_ProfilePic", infringingUser_ProfilePic);
 	        	jobj.put("unlike_value", unlike_value);
+	        	jobj.put("FeedBackMessage", FeedBackMessage);
+	        	jobj.put("IsTwitterPost", IsTwitterPost);
 	        	}
 	        	
 	        	else
@@ -93,6 +100,7 @@ public class Post {
 	        		 jobj = new JSONObject().put("Post_Detail", Post_Detail);
 	        		 jobj.put("Post_ID", Post_ID);
 	        		 jobj.put("Post_Image", Post_Image);
+	        		 jobj.put("IsTwitterPost", IsTwitterPost);
 	        	}
 
 	        	

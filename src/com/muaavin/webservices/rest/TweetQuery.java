@@ -47,16 +47,16 @@ public class TweetQuery {
 		} 
 		recordPresent = false;
 		////
-		rs = (ResultSet) st.executeQuery("select id from twitterUsers where id = '"+ user_id+"';");
+		rs = (ResultSet) st.executeQuery("select id  from twitterUsers where id = '"+ user_id+"' ;");
 		while(rs.next()) { recordPresent = true; System.out.println("User Already Present :"+ recordPresent); }
-		if(!recordPresent) {st.executeUpdate("INSERT INTO TwitterUsers( id,  name, profilePic,state,type) VALUES ('"+user_id+"','"+user_name+"','"+imageURL+"','"+"unBlocked"+"','NonInfringing"+"');");  Response = "Report sent successfully"; }
+		if(!recordPresent) {st.executeUpdate("INSERT INTO TwitterUsers( id,  name, profilePic,state) VALUES ('"+user_id+"','"+user_name+"','"+imageURL+"','"+"UnBlocked');");  Response = "Report sent successfully"; }
 		recordPresent = false;
 		////
 		
-		rs = (ResultSet) st.executeQuery("select id from twitterUsers where id = '"+ infringingUser_id+"';");
+		rs = (ResultSet) st.executeQuery("select id from Twitter_InfringingUsers where id = '"+ infringingUser_id+"';");
 		while(rs.next()) { recordPresent = true; }
-		if(!recordPresent) { st.executeUpdate("INSERT INTO TwitterUsers( id,  name, profilePic,state,type) VALUES ('"+infringingUser_id+"','"+infringingUserName+"','"+infringingUserProfilePic+"','"+"unBlocked"+"','Infringing');"); recordPresent = false;Response = "Report sent successfully";}
-		else { st.executeUpdate("UPDATE  TwitterUsers SET type = 'Infringing' where id = '"+infringingUser_id+"';"); }
+		if(!recordPresent) { st.executeUpdate("INSERT INTO Twitter_InfringingUsers( id,  name, profilePic,state) VALUES ('"+infringingUser_id+"','"+infringingUserName+"','"+infringingUserProfilePic+"','"+"UnBlocked"+"');"); recordPresent = false;Response = "Report sent successfully";}
+		//else { st.executeUpdate("UPDATE  TwitterUsers SET type = 'Infringing' where id = '"+infringingUser_id+"';"); }
 		conn.close(); return AesEncryption.encrypt(Response);
 		
 		

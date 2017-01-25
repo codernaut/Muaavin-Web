@@ -15,11 +15,12 @@ import com.mysql.jdbc.ResultSet;
 @Path("/ThumbsDown") 
 public class ThumbsDown {
 	
+	ResultSet rs;
 
 	@POST
 	@Path("/Add_ThumbsDown")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String Add_ThumbsDown(@QueryParam("user_id") String user_id, @QueryParam("post_id") String post_id ) throws Exception
+	public String Add_ThumbsDown(@QueryParam("user_id") String user_id, @QueryParam("post_id") String post_id, @QueryParam("IsTwitterPost") boolean IsTwitterPost ) throws Exception
 	{
 		user_id = AesEncryption.decrypt(user_id);
 		post_id = AesEncryption.decrypt(post_id);
@@ -28,16 +29,24 @@ public class ThumbsDown {
 		Connection conn = Db.connect();
 		Statement st = conn.createStatement();
 		boolean RecordPresent = false;
-			 
-		ResultSet rs = (ResultSet) st.executeQuery("select* from ThumbsDown;");
+		
+		if(IsTwitterPost) { rs = (ResultSet) st.executeQuery("select TweetID as post_id, User_ID as user_id from TwitterThumbsDown;"); }
+		
+		else { rs = (ResultSet) st.executeQuery("select* from ThumbsDown;"); }
+		
 		if(RecordPresent = checkIfRecordAlreadyPresent(rs, post_id, user_id) == true)
 		{
-			st.executeUpdate("delete from ThumbsDown where user_id = '"+user_id+"' and post_id = '"+post_id+"';");	 
+			if(IsTwitterPost) { st.executeUpdate("delete from TwitterThumbsDown where User_ID  = '"+user_id+"' and TweetID = '"+post_id+"';");}
+			
+			else { st.executeUpdate("delete from ThumbsDown where user_id = '"+user_id+"' and post_id = '"+post_id+"';");	} 
 		}
 		else
 		{
-			st.executeUpdate("INSERT INTO ThumbsDown(user_id,  post_id) VALUES('"+user_id+"','"+post_id+"');");
-			System.out.println("User id!"+ user_id +"Post id" +post_id);
+			if(IsTwitterPost) { st.executeUpdate("INSERT INTO TwitterThumbsDown(User_ID,  TweetID) VALUES('"+user_id+"','"+post_id+"');"); }
+			
+			else { st.executeUpdate("INSERT INTO ThumbsDown(user_id,  post_id) VALUES('"+user_id+"','"+post_id+"');"); }
+			
+			System.out.println("User id"+ user_id +"Post id" +post_id);
 		}
 		return AesEncryption.encrypt("record successfully inserted");
 		
