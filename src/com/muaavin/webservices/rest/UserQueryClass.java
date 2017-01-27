@@ -36,20 +36,17 @@ public class UserQueryClass {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getUsers() throws Exception
 	{
-		users = new ArrayList<User>();
+		infringing_users = new ArrayList<User>();
 		MySqlDb db = new MySqlDb();
 		Connection conn = db.connect();
 		Statement st = conn.createStatement();
 		ResultSet rs = null;
-		String sql = "select* from users;";
+		String sql = "select name as Name , id as User_ID, profilePic as Profile_pic ,state from users;";
 		rs = (ResultSet) st.executeQuery(sql);
-		    
-		while(rs.next()) 
-		{ 
-		   User user = User.initializeUser(rs.getString("name"), rs.getString("id"), rs.getString("profilePic"),rs.getString("state"),false); 		    	  
-		   users.add(user); 
-		}    	
-		return AesEncryption.encrypt(users.toString());	
+		getTwitterAndFacebookUsersFromDB(rs ,  false , false);
+		rs = (ResultSet) st.executeQuery("select distinct id as  User_ID, name as Name , profilePic as Profile_pic , state from twitterUsers ;");
+		getTwitterAndFacebookUsersFromDB(rs ,  false , true);
+		return AesEncryption.encrypt(infringing_users.toString());	
 	}
 	
 	@POST
@@ -68,7 +65,8 @@ public class UserQueryClass {
 		//return "User Already Blocked";
 		if(isTwitterUser)	
 		{
-			st.executeUpdate("UPDATE TwitterUsers SET state ='Blocked' where User_ID = '"+user_id+"';");
+			st.executeUpdate("UPDATE TwitterUsers SET state ='Blocked' where id = '"+user_id+"';");
+			st.executeUpdate("UPDATE Twitter_InfringingUsers SET state ='Blocked' where id = '"+user_id+"';");
 			return AesEncryption.encrypt("User Successfully Blocked");
 		}
 		else
@@ -77,7 +75,6 @@ public class UserQueryClass {
 			st.executeUpdate("UPDATE Users SET state ='Blocked' where id = '"+user_id+"';");
 			return AesEncryption.encrypt("User Successfully Blocked");
 		}
-
 	}
 	
 	// Check if user is already blocked
@@ -91,12 +88,12 @@ public class UserQueryClass {
 		return false;
 	}
 	
-	public List<User> getBlockedUsersList(ResultSet rs ,List<User> Users) throws SQLException // Get List of Blocked Users
+	public List<User> getBlockedUsersList(ResultSet rs ,List<User> Users, boolean isTwitterData) throws SQLException // Get List of Blocked Users
 	{
 		users = Users;
 		while(rs.next()) 
 		{  		   
-		   User user = User.initializeUser("", rs.getString("User_ID"), "","",false);	   
+		   User user = User.initializeUser("", rs.getString("User_ID"), "","",isTwitterData);	   
 		   users.add(user);
 		}	
 		//return users.toString() ;
@@ -131,8 +128,11 @@ public class UserQueryClass {
 		Connection conn = Db.connect();
 		Statement st = conn.createStatement();
 		ResultSet rs = (ResultSet) st.executeQuery("select* from BlockedUsers;");
-		String JsonResponseUsers = getBlockedUsersList(rs,new ArrayList<User>()).toString();
-		return AesEncryption.encrypt(JsonResponseUsers);
+		List<User> Users = getBlockedUsersList(rs,new ArrayList<User>(),false);
+		rs = (ResultSet) st.executeQuery("select * from BlockedTwitterUsers;");
+		Users = getBlockedUsersList(rs,Users,true);
+		//String JsonResponseUsers = getBlockedUsersList(rs,new ArrayList<User>(),false).toString();
+		return AesEncryption.encrypt(Users.toString());
 	}
 	@POST
 	@Path("/UnBlockUser")
@@ -145,7 +145,8 @@ public class UserQueryClass {
 		Statement st = conn.createStatement();
 		if(isTwitterUser)
 		{
-			st.executeUpdate("UPDATE TwitterUsers SET state ='UnBlocked' where User_ID = '"+user_id+"';");
+			st.executeUpdate("UPDATE TwitterUsers SET state ='UnBlocked' where id = '"+user_id+"';");
+			st.executeUpdate("UPDATE Twitter_InfringingUsers SET state ='UnBlocked' where id = '"+user_id+"';");
 			return AesEncryption.encrypt("User Unblocked");
 		}
 		else 
@@ -256,8 +257,11 @@ public class UserQueryClass {
 	{
 		if(isTwitterData)
 		{
-			st.executeUpdate(" delete from TweetTable where Infringing_User_ID = '"+UserID+"';");
-			st.executeUpdate(" UPDATE  TwitterUsers SET type = 'NonInfringing' where id = '"+UserID+"';");	 
+			st.executeUpdate("delete from TwitterFeedBack where TweetID in (select TweetID from TweetTable where Infringing_User_ID = '"+UserID+"');");
+			st.executeUpdate("delete from TwitterThumbsDown where TweetID in (select TweetID from TweetTable where Infringing_User_ID = '"+UserID+"');");
+			st.executeUpdate("delete from TweetTable where Infringing_User_ID = '"+UserID+"';");
+			st.executeUpdate("delete from Twitter_InfringingUsers where id  = '"+UserID+"';");
+			System.out.println("User UnReported");
 		}
 		else
 		{
@@ -283,10 +287,5 @@ public class UserQueryClass {
 				infringing_users.add(user);
 			}
 		}
-	}
-	
-	
-	
-	
-	
+	}	
 }
