@@ -54,9 +54,11 @@ public class TweetQuery {
 		////
 		
 		rs = (ResultSet) st.executeQuery("select id from Twitter_InfringingUsers where id = '"+ infringingUser_id+"';");
+		
 		while(rs.next()) { recordPresent = true; }
+		
 		if(!recordPresent) { st.executeUpdate("INSERT INTO Twitter_InfringingUsers( id,  name, profilePic,state) VALUES ('"+infringingUser_id+"','"+infringingUserName+"','"+infringingUserProfilePic+"','"+"UnBlocked"+"');"); recordPresent = false;Response = "Report sent successfully";}
-		//else { st.executeUpdate("UPDATE  TwitterUsers SET type = 'Infringing' where id = '"+infringingUser_id+"';"); }
+		
 		conn.close(); return AesEncryption.encrypt(Response);
 		
 		
