@@ -1,0 +1,206 @@
+create database Muaavin;
+use  Muaavin;
+create table groupTable(id int unsigned auto_increment primary key not null, name varchar(50) not null);
+create table infringingUsers(Post_ID varchar(100) ,Group_ID int,User_ID varchar(100) not null, Profile_pic varchar(1000),Comment_ID varchar(100) not null, Name varchar(100) not null,  Profile_Name varchar(50),state varchar(100) not null,PRIMARY KEY (Post_ID,Group_ID,User_ID,Comment_ID));
+create table Users(id varchar(100) not null,name varchar(100) not null, profilePic varchar(1000) not null, state varchar(100) not null , PRIMARY KEY(id) );
+create table postTable(id varchar(100) not null, group_name varchar(50) not null, post_Detail varchar(2000),User_ID varchar(100) not null ,InfringingUserID varchar(100) not null,  Post_Image varchar(1000), PRIMARY KEY(id,group_name,User_ID,InfringingUserID));
+create table Comments(User_ID varchar(100) not null, InfringingUserId varchar(100) not null, PostId varchar(100) not null,Parent_Comment_id varchar(100) not null,Comment_ID varchar(100) not null,Group_Name varchar(50) not null, Comment varchar(2000), PRIMARY KEY(PostId,Comment_ID,User_ID,InfringingUserId,Group_Name,Parent_Comment_id));
+create table Posts_Comments_Table(Post_ID varchar(100) not null , Comment_ID varchar(100) not null , PRIMARY KEY(Post_ID,Comment_ID));
+create table userFeedBack(id int unsigned auto_increment primary key not null, post_id varchar(100) not null, user_id varchar(100) not null, comment varchar(2000));
+create table ThumbsDown(post_id varchar(100) not null, user_id varchar(100) not null, PRIMARY KEY(post_id,user_id));
+create table CommentsThumbDown(post_id varchar(100) not null, commentId varchar(100) not null, PcommentId varchar(100), user_id varchar(100) not null, InfringingUserId varchar(100) not null, PRIMARY KEY(post_id,user_id,commentId, PcommentId));
+create table PostFeedBack(id int unsigned auto_increment primary key not null, post_id varchar(100) not null, user_id varchar(100) not null, comment varchar(2000));
+create table CommentFeedBack(id int unsigned auto_increment primary key not null, post_id varchar(100) not null, Pcommentid varchar(100) , Comment_id varchar(100) not null, user_id varchar(100) not null, InfriningUserId varchar(100) not null, comment varchar(2000));
+
+
+CREATE VIEW Group_A AS
+select distinct postTable.id, Comments.Parent_Comment_id, Comments.Comment_ID, infringingUsers.Name,infringingUsers.Profile_pic,postTable.Post_Image,Comments.Comment, postTable.post_Detail
+from postTable, Comments, infringingUsers, Posts_Comments_Table
+where postTable.id=Posts_Comments_Table.Post_ID and Posts_Comments_Table.Comment_ID = Comments.Comment_ID and infringingUsers.Comment_ID = Comments.Comment_ID and Comments.Group_Name = 'A';
+
+CREATE VIEW Group_B AS
+select distinct postTable.id, Comments.Parent_Comment_id, Comments.Comment_ID, infringingUsers.Name,infringingUsers.Profile_pic,postTable.Post_Image,Comments.Comment, postTable.post_Detail
+from postTable, Comments, infringingUsers, Posts_Comments_Table
+where postTable.id=Posts_Comments_Table.Post_ID and Posts_Comments_Table.Comment_ID = Comments.Comment_ID and infringingUsers.Comment_ID = Comments.Comment_ID and Comments.Group_Name = 'B';
+
+
+CREATE VIEW Group_C AS
+select distinct postTable.id, Comments.Parent_Comment_id, Comments.Comment_ID, infringingUsers.Name,infringingUsers.Profile_pic,postTable.Post_Image,Comments.Comment, postTable.post_Detail
+from postTable, Comments, infringingUsers, Posts_Comments_Table
+where postTable.id=Posts_Comments_Table.Post_ID and Posts_Comments_Table.Comment_ID = Comments.Comment_ID and infringingUsers.Comment_ID = Comments.Comment_ID and Comments.Group_Name = 'C';
+
+CREATE VIEW Group_All AS
+select distinct postTable.id, Comments.Parent_Comment_id, Comments.Comment_ID, infringingUsers.Name,infringingUsers.Profile_pic,postTable.Post_Image,Comments.Comment, postTable.post_Detail
+from postTable, Comments, infringingUsers, Posts_Comments_Table
+where postTable.id=Posts_Comments_Table.Post_ID and Posts_Comments_Table.Comment_ID = Comments.Comment_ID and infringingUsers.Comment_ID = Comments.Comment_ID and Comments.Group_Name = postTable.group_name;
+
+CREATE VIEW ThumbsDown_View AS
+select ThumbsDown.post_id, count(*) AS  total_Unlikes
+from ThumbsDown
+group by ThumbsDown.post_id;
+
+CREATE VIEW  CommentsThumbDown_View as
+select post_id, PcommentId, commentId, count(*)  as  total_Unlikes
+from CommentsThumbDown
+group by post_id, PcommentId, commentId;
+
+Create View GroupAPostDetailWithThumbdown AS
+select distinct posttable.id, posttable.Post_Image, posttable.post_Detail, ThumbsDown_View.total_unlikes from PostTable 
+left join  (ThumbsDown_View) on posttable.id = ThumbsDown_View.post_id
+where posttable.group_name = 'A';
+
+Create View GroupBPostDetailWithThumbdown AS
+select distinct posttable.id, posttable.Post_Image, posttable.post_Detail, ThumbsDown_View.total_unlikes from PostTable 
+left join  (ThumbsDown_View) on posttable.id = ThumbsDown_View.post_id
+where posttable.group_name = 'B';
+
+Create View GroupCPostDetailWithThumbdown AS
+select distinct posttable.id, posttable.Post_Image, posttable.post_Detail, ThumbsDown_View.total_unlikes from PostTable 
+left join  (ThumbsDown_View) on posttable.id = ThumbsDown_View.post_id
+where posttable.group_name = 'C';
+
+Create View GroupAllPostDetailWithThumbdown AS
+select distinct posttable.id, posttable.Post_Image, posttable.post_Detail, ThumbsDown_View.total_unlikes from PostTable 
+left join  (ThumbsDown_View) on posttable.id = ThumbsDown_View.post_id;
+
+Create View GroupAPostDetailWithFeedBack AS
+select  GroupAPostDetailWithThumbdown.*, postfeedback.comment from GroupAPostDetailWithThumbdown 
+left join (PostFeedBack) on  GroupAPostDetailWithThumbdown.id = postfeedback.post_id;
+
+Create View GroupBPostDetailWithFeedBack AS
+select  GroupBPostDetailWithThumbdown.*, postfeedback.comment from GroupBPostDetailWithThumbdown
+left join (PostFeedBack) on  GroupBPostDetailWithThumbdown.id = postfeedback.post_id;
+
+Create View GroupCPostDetailWithFeedBack AS
+select  GroupCPostDetailWithThumbdown.*, postfeedback.comment from GroupCPostDetailWithThumbdown
+left join (PostFeedBack) on  GroupCPostDetailWithThumbdown.id = postfeedback.post_id;
+
+Create View GroupAllPostDetailWithFeedBack AS
+select  GroupAllPostDetailWithThumbdown.*, postfeedback.comment from GroupAllPostDetailWithThumbdown
+left join (PostFeedBack) on  GroupAllPostDetailWithThumbdown.id = postfeedback.post_id;
+
+CREATE VIEW Group_ACommentDetail AS
+select distinct PostId as id, Parent_Comment_id, Comment_ID, Comment from  Comments where Group_Name = 'A';
+CREATE VIEW Group_BCommentDetail AS
+select distinct PostId as id, Parent_Comment_id, Comment_ID, Comment from  Comments where  Group_Name = 'B';
+CREATE VIEW Group_CCommentDetail AS
+select distinct PostId as id, Parent_Comment_id, Comment_ID, Comment from  Comments where   Group_Name = 'C';
+CREATE VIEW Group_AllCommentDetail AS
+select distinct PostId as id, Parent_Comment_id, Comment_ID, Comment from Comments;
+
+CREATE VIEW Group_ACommentDetailWithThumbDown AS
+select Group_ACommentDetail.* , commentsThumbDown_View.total_unlikes
+from  Group_ACommentDetail
+left join(commentsThumbDown_View)
+on Group_ACommentDetail.id = commentsThumbDown_View.post_id
+and Group_ACommentDetail.Parent_Comment_id = commentsThumbDown_View.PcommentId
+and Group_ACommentDetail.Comment_ID = commentsThumbDown_View.commentId;
+
+CREATE VIEW Group_BCommentDetailWithThumbDown AS
+select Group_BCommentDetail.* , commentsThumbDown_View.total_unlikes
+from  Group_BCommentDetail
+left join(commentsThumbDown_View)
+on Group_BCommentDetail.id = commentsThumbDown_View.post_id
+and Group_BCommentDetail.Parent_Comment_id = commentsThumbDown_View.PcommentId
+and Group_BCommentDetail.Comment_ID = commentsThumbDown_View.commentId;
+
+CREATE VIEW Group_CCommentDetailWithThumbDown AS
+select Group_CCommentDetail.* , commentsThumbDown_View.total_unlikes
+from  Group_CCommentDetail
+left join(commentsThumbDown_View)
+on Group_CCommentDetail.id = commentsThumbDown_View.post_id
+and Group_CCommentDetail.Parent_Comment_id = commentsThumbDown_View.PcommentId
+and Group_CCommentDetail.Comment_ID = commentsThumbDown_View.commentId;
+
+CREATE VIEW Group_AllCommentDetailWithThumbDown AS
+select Group_AllCommentDetail.* , commentsThumbDown_View.total_unlikes
+from  Group_AllCommentDetail
+left join(commentsThumbDown_View)
+on Group_AllCommentDetail.id = commentsThumbDown_View.post_id
+and Group_AllCommentDetail.Parent_Comment_id = commentsThumbDown_View.PcommentId
+and Group_AllCommentDetail.Comment_ID = commentsThumbDown_View.commentId;
+
+
+CREATE VIEW Group_AllCommentDetailWithFeedBack AS
+select  Group_AllCommentDetailWithThumbDown.* , CommentFeedBack.comment as FeedBackMessage
+from Group_AllCommentDetailWithThumbDown
+left join (CommentFeedBack) on  Group_AllCommentDetailWithThumbDown.id = CommentFeedBack.post_id and  Group_AllCommentDetailWithThumbDown.Comment_id = CommentFeedBack.Comment_id
+and  Group_AllCommentDetailWithThumbDown.Parent_Comment_id = CommentFeedBack.Pcommentid;
+
+CREATE VIEW Group_ACommentDetailWithFeedBack AS
+select  Group_ACommentDetailWithThumbDown.* , CommentFeedBack.comment as FeedBackMessage
+from Group_ACommentDetailWithThumbDown
+left join (CommentFeedBack) on  Group_ACommentDetailWithThumbDown.id = CommentFeedBack.post_id and  Group_ACommentDetailWithThumbDown.Comment_id = CommentFeedBack.Comment_id
+and  Group_ACommentDetailWithThumbDown.Parent_Comment_id = CommentFeedBack.Pcommentid;
+
+CREATE VIEW Group_BCommentDetailWithFeedBack AS
+select  Group_BCommentDetailWithThumbDown.* , CommentFeedBack.comment as FeedBackMessage
+from Group_BCommentDetailWithThumbDown
+left join (CommentFeedBack) on  Group_BCommentDetailWithThumbDown.id = CommentFeedBack.post_id and  Group_BCommentDetailWithThumbDown.Comment_id = CommentFeedBack.Comment_id
+and  Group_BCommentDetailWithThumbDown.Parent_Comment_id = CommentFeedBack.Pcommentid;
+
+CREATE VIEW Group_CCommentDetailWithFeedBack AS
+select  Group_CCommentDetailWithThumbDown.* , CommentFeedBack.comment as FeedBackMessage
+from Group_CCommentDetailWithThumbDown
+left join (CommentFeedBack) on  Group_CCommentDetailWithThumbDown.id = CommentFeedBack.post_id and  Group_CCommentDetailWithThumbDown.Comment_id = CommentFeedBack.Comment_id
+and  Group_CCommentDetailWithThumbDown.Parent_Comment_id = CommentFeedBack.Pcommentid;
+
+
+
+
+
+
+create table BlockUser(UserID varchar(100) not null PRIMARY KEY);
+
+CREATE VIEW BlockedUsers AS
+select User_ID from infringingUsers
+where state = 'Blocked'
+union
+select id from users
+where state = 'Blocked';
+
+
+create table TwitterUsers(id varchar(100) not null,name varchar(100) not null, profilePic varchar(1000) not null, state varchar(100) not null , PRIMARY KEY(id));
+create table Twitter_InfringingUsers(id varchar(100) not null,name varchar(100) not null, profilePic varchar(1000) not null, state varchar(100) not null , PRIMARY KEY(id));
+create table TweetTable(TweetID varchar(100) not null,message varchar(1000) , ImageUrl varchar(1000) ,User_ID varchar(100) not null,Infringing_User_ID varchar(100) not null,Group_Name varchar(100) not null, PRIMARY KEY(TweetID, Group_Name,User_ID ));
+
+CREATE VIEW  TwitterInfringingUsers AS
+select distinct Twitter_InfringingUsers.id , Twitter_InfringingUsers.name , Twitter_InfringingUsers.profilePic, Twitter_InfringingUsers.state , TweetTable.Group_Name , TweetTable.User_ID 
+from TweetTable, Twitter_InfringingUsers 
+where TweetTable.Infringing_User_ID =Twitter_InfringingUsers.id;
+
+Create View  FacebookInfringingUsers AS
+select distinct infringingUsers.User_ID as id,infringingUsers.Name as name, infringingUsers.Profile_pic as profilePic ,groupTable.name as Group_Name ,infringingUsers.state  from groupTable,infringingUsers where groupTable.id=infringingUsers.Group_ID ;
+
+Create view BlockedTwitterUsers AS
+select id as User_ID from TwitterUsers where state = 'Blocked'
+union
+select id as User_ID from Twitter_InfringingUsers where state = 'Blocked';
+
+create table TwitterThumbsDown(TweetID varchar(100) not null, User_ID varchar(100), Primary Key (TweetID,User_ID));
+create table TwitterFeedBack(TweetID varchar(100) , User_ID varchar(100), Message varchar (1000) ,id int unsigned auto_increment primary key not null);
+
+CREATE VIEW TwitterThumbsDown_View AS
+select TwitterThumbsDown.TweetID, count(*) AS  total_Unlikes
+from TwitterThumbsDown
+group by TwitterThumbsDown.TweetID;
+
+
+CREATE VIEW GroupA_TweetDetail AS
+select distinct TweetTable.TweetID, TweetTable.ImageUrl, TweetTable.message, TwitterThumbsDown_View.total_unlikes from TweetTable  left join (TwitterThumbsDown_View) on  TweetTable.TweetID  =  TwitterThumbsDown_View.TweetID where TweetTable.Group_Name = 'A';
+CREATE VIEW GroupB_TweetDetail AS
+select distinct TweetTable.TweetID, TweetTable.ImageUrl,TweetTable.message, TwitterThumbsDown_View.total_unlikes from TweetTable  left join (TwitterThumbsDown_View) on  TweetTable.TweetID  =  TwitterThumbsDown_View.TweetID where TweetTable.Group_Name = 'B';
+CREATE VIEW GroupC_TweetDetail AS
+select distinct TweetTable.TweetID, TweetTable.ImageUrl,TweetTable.message, TwitterThumbsDown_View.total_unlikes from TweetTable  left join (TwitterThumbsDown_View) on  TweetTable.TweetID  =  TwitterThumbsDown_View.TweetID where TweetTable.Group_Name = 'C';
+CREATE VIEW GroupAll_TweetDetail AS
+select distinct TweetTable.TweetID, TweetTable.ImageUrl,TweetTable.message, TwitterThumbsDown_View.total_unlikes from TweetTable  left join (TwitterThumbsDown_View) on  TweetTable.TweetID  =  TwitterThumbsDown_View.TweetID ;
+
+CREATE VIEW GroupA_TweetDetailWithFeedBack AS
+select GroupA_TweetDetail.Tweetid as id, GroupA_TweetDetail.ImageUrl as Post_Image, GroupA_TweetDetail.message as post_Detail , GroupA_TweetDetail.total_unlikes , TwitterFeedBack.message from GroupA_TweetDetail left join(TwitterFeedBack) on GroupA_TweetDetail.TweetID = TwitterFeedBack.TweetID;
+CREATE VIEW GroupB_TweetDetailWithFeedBack AS
+select GroupB_TweetDetail.Tweetid as id, GroupB_TweetDetail.ImageUrl as Post_Image, GroupB_TweetDetail.message as post_Detail , GroupB_TweetDetail.total_unlikes , TwitterFeedBack.message from GroupB_TweetDetail left join(TwitterFeedBack) on GroupB_TweetDetail.TweetID = TwitterFeedBack.TweetID;
+CREATE VIEW GroupC_TweetDetailWithFeedBack AS
+select GroupC_TweetDetail.Tweetid as id, GroupC_TweetDetail.ImageUrl as Post_Image, GroupC_TweetDetail.message as post_Detail , GroupC_TweetDetail.total_unlikes , TwitterFeedBack.message from GroupC_TweetDetail left join(TwitterFeedBack) on GroupC_TweetDetail.TweetID = TwitterFeedBack.TweetID;
+CREATE VIEW GroupAll_TweetDetailWithFeedBack AS
+select GroupAll_TweetDetail.Tweetid as id, GroupAll_TweetDetail.ImageUrl as Post_Image, GroupAll_TweetDetail.message as post_Detail , GroupAll_TweetDetail.total_unlikes , TwitterFeedBack.message from GroupAll_TweetDetail left join(TwitterFeedBack) on GroupAll_TweetDetail.TweetID = TwitterFeedBack.TweetID;
+
