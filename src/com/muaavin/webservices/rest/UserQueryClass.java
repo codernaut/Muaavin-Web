@@ -61,8 +61,6 @@ public class UserQueryClass {
 		Statement st = conn.createStatement();
 		String sql = "select* from BlockedUsers;";
 		ResultSet rs = (ResultSet) st.executeQuery(sql);
-		//if(isUserAlreadyBlocked(rs, user_id)== true)
-		//return "User Already Blocked";
 		if(isTwitterUser)	
 		{
 			st.executeUpdate("UPDATE TwitterUsers SET state ='Blocked' where id = '"+user_id+"';");
@@ -265,9 +263,13 @@ public class UserQueryClass {
 		}
 		else
 		{
-			st.executeUpdate("delete from postTable where id in (select Post_ID from infringingUsers where Post_ID in (select DISTINCT(Post_ID) from infringingUsers where User_ID = '"+UserID+"') group by Post_ID having COUNT(DISTINCT User_ID) = 1);");	
-			st.executeUpdate("delete from posts_comments_table where Post_ID in (select Post_ID from infringingUsers where Post_ID in (select DISTINCT(Post_ID) from infringingUsers where User_ID = '"+UserID+"') group by Post_ID having COUNT(DISTINCT User_ID) = 1);");	
+			// Delete from PostThumbDown Delete from post FeedBack 
+			st.executeUpdate("delete from commentsThumbDown where InfringingUserId = '"+UserID+"');");
+			st.executeUpdate("delete from commentFeedBack where InfringingUserId = '"+UserID+"');");
+			st.executeUpdate("delete from PostTable where   InfringingUserId = '"+UserID+"';");	
+			st.executeUpdate("delete from comments where   InfringingUserId = '"+UserID+"';");	
 			st.executeUpdate("delete from infringingUsers where User_ID = '"+UserID+"';");
+			
 		}
 	}
 	

@@ -115,7 +115,7 @@ public class Post_Insert_QueryClass {
 			 try{
 				 ///////////////////////
 				 int count = 0;
-				 String sql = "select count(id) as val from postTable where id = '"+P_id+"' and group_name = '"+G_name+"' and User_ID = '"+profile_name+"';";
+				 String sql = "select count(id) as val from postTable where id = '"+P_id+"' and group_name = '"+G_name+"' and User_ID = '"+profile_name+"' and InfringingUserID = '"+user_id+"';";
 				 rs = (ResultSet) st.executeQuery(sql);
 				 
 				 while(rs.next()) { 
@@ -125,10 +125,10 @@ public class Post_Insert_QueryClass {
 				  
 				 }
 				 	 
-				 if(count == 0)
+			if(count == 0)
 				 ///////////////////////
 			 {
-					 String sql1 = "INSERT INTO postTable(id,group_name, post_Detail,User_ID,Post_Image)"+"VALUES('"+P_id+"','"+G_name+"','"+Post_Det+"','"+profile_name+"','"+Post_image+"');";
+					 String sql1 = "INSERT INTO postTable(id,group_name, post_Detail,User_ID,InfringingUserID,Post_Image)"+"VALUES('"+P_id+"','"+G_name+"','"+Post_Det+"','"+profile_name+"','"+user_id+"','"+Post_image+"');";
 					 st.executeUpdate(sql1);
 		     }
 				 
@@ -142,7 +142,7 @@ public class Post_Insert_QueryClass {
 			 try{
 				 
 				 int count = 0;
-				 String sql = "select count(Comment_ID) as val from Comments where Comment_ID = '"+Comment_id+"' and User_ID = '"+profile_name+"' and Group_Name = '"+G_name+"';";
+				 String sql = "select count(Comment_ID) as val from Comments where Comment_ID = '"+Comment_id+"' and User_ID = '"+profile_name+"' and Group_Name = '"+G_name+"' and  Parent_Comment_id = '"+P_Commentid+"' and  PostId = '"+Post_ID+"' and InfringingUserId ='"+user_id+"';";
 				 rs = (ResultSet) st.executeQuery(sql);
 				 
 				 while(rs.next()) { 
@@ -155,7 +155,7 @@ public class Post_Insert_QueryClass {
 				 if(count == 0)
 				 {
 					
-					 String sql1 = "INSERT INTO Comments(User_ID,Parent_Comment_id,Comment_ID,Group_Name, Comment)"+"VALUES('"+profile_name+"','"+P_Commentid+"','"+Comment_id+"','"+G_name+"','"+Comment+"');";
+					 String sql1 = "INSERT INTO Comments(User_ID,InfringingUserId, PostId,Parent_Comment_id,Comment_ID,Group_Name, Comment)"+"VALUES('"+profile_name+"','"+user_id+"','"+P_id+"','"+P_Commentid+"','"+Comment_id+"','"+G_name+"','"+Comment+"');";
 				     st.executeUpdate(sql1);
 					
 				 }
