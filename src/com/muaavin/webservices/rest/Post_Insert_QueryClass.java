@@ -68,17 +68,32 @@ public class Post_Insert_QueryClass {
 			 response = "inside try statement :";
 			 response = "Report sent Successfully.";
 
-			 System.out.print("P_id "+P_id+" G_id "+G_id+" Gname "+G_name+" Profile name "+profile_name + " User ID "+user_id+ " Comment_id "+Comment_id+" Parent Comment_id "+P_Commentid+" Post Detail "+Post_Det+" Post image " + Post_image+" User State " + user_state+" InfringingUserState  " +reportedUserState/*+ " infringing user profile pic " + infringingUser_ProfilePic*/);
+			System.out.print("P_id "+P_id+" G_id "+G_id+" Gname "+G_name+" Profile name "+profile_name + " User ID "+user_id+ " Comment_id "+Comment_id+" Parent Comment_id "+P_Commentid+" Post Detail "+Post_Det+" Post image " + Post_image+" User State " + user_state+" InfringingUserState  " +reportedUserState/*+ " infringing user profile pic " + infringingUser_ProfilePic*/);
 			
 			 
 			try{
-			 String sql = "INSERT INTO infringingUsers(Post_ID, Group_ID,Profile_Name,User_ID,Profile_pic, Name,Comment_ID, state) VALUES ('"+P_id+"','"+G_id+"','"+profile_name+"','"+user_id+"','"+infringingUser_ProfilePic+"','"+infringinguser_name+"','"+Comment_id+"','"+reportedUserState+"');";
+				int count = 0;
+				{
+					String sql = "select * from infringingUsers where User_ID = '"+user_id+"';";	
+					rs = (ResultSet) st.executeQuery(sql);
+					
+					while(rs.next()) { 
+						 
+					   count = count+1; break;	
+					   				  
+					 }
+				 }	
+			if(count ==  0)
+			{
+			 String sql = "INSERT INTO infringingUsers(User_ID,Profile_pic, Name, state) VALUES ('"+user_id+"','"+infringingUser_ProfilePic+"','"+infringinguser_name+"','"+reportedUserState+"');";
 			 st.executeUpdate(sql);
+			}
 			
 			} catch(Exception e)
 			{
 				response = " Record Already Present!";
 				System.out.println("infringingUsers record already Present");
+				response = "Report sent Successfully.";
 				e.printStackTrace();
 			}
 	
@@ -86,14 +101,13 @@ public class Post_Insert_QueryClass {
 				
 				int count = 0;
 				{
-				String sql = "select count(id) as val from Users where id = '"+profile_name+"';";	
+				String sql = "select * from Users where id = '"+profile_name+"';";	
 				rs = (ResultSet) st.executeQuery(sql);
 				
 				while(rs.next()) { 
-					 System.out.println("afdg");
-
-				   count = rs.getInt("val"); //User_ID
-				  
+					 
+				   count = count + 1; //User_ID
+				   break;
 				 }
 				}
 						
@@ -106,7 +120,7 @@ public class Post_Insert_QueryClass {
 			     
 				 } catch(Exception e){
 					 //response = "Record Inserted Successfully";
-					 //response = "Users Record Already Present!";
+					 response = "Users Record Already Present!";
 					 System.out.println("Users record already Present");
 					 e.printStackTrace();
 				 }
@@ -115,14 +129,12 @@ public class Post_Insert_QueryClass {
 			 try{
 				 ///////////////////////
 				 int count = 0;
-				 String sql = "select count(id) as val from postTable where id = '"+P_id+"' and group_name = '"+G_name+"' and User_ID = '"+profile_name+"' and InfringingUserID = '"+user_id+"';";
+				 String sql = "select * from postTable where id = '"+P_id+"' and group_name = '"+G_name+"' and User_ID = '"+profile_name+"' and InfringingUserID = '"+user_id+"';";
 				 rs = (ResultSet) st.executeQuery(sql);
 				 
 				 while(rs.next()) { 
-					 System.out.println("afdg");
-
-				   count = rs.getInt("val"); //User_ID
-				  
+					 
+				   count = count+1; //User_ID
 				 }
 				 	 
 			if(count == 0)
@@ -142,27 +154,28 @@ public class Post_Insert_QueryClass {
 			 try{
 				 
 				 int count = 0;
-				 String sql = "select count(Comment_ID) as val from Comments where Comment_ID = '"+Comment_id+"' and User_ID = '"+profile_name+"' and Group_Name = '"+G_name+"' and  Parent_Comment_id = '"+P_Commentid+"' and  PostId = '"+Post_ID+"' and InfringingUserId ='"+user_id+"';";
+				 String sql = "select * from Comments where Comment_ID = '"+Comment_id+"' and User_ID = '"+profile_name+"' and Group_Name = '"+G_name+"' and  Parent_Comment_id = '"+P_Commentid+"' and  PostId = '"+Post_ID+"' and InfringingUserId ='"+user_id+"';";
 				 rs = (ResultSet) st.executeQuery(sql);
 				 
 				 while(rs.next()) { 
-					 System.out.println("afdg");
-
-				   count = rs.getInt("val"); //User_ID
-				  
+					 System.out.println("abcd");
+					 System.out.println("abcd");
+					 count = count+1;
+				   response = "Record Already Present!";
+				   break;
 				 }
 				 	 
 				 if(count == 0)
 				 {
-					
+					 System.out.println("xyz");
 					 String sql1 = "INSERT INTO Comments(User_ID,InfringingUserId, PostId,Parent_Comment_id,Comment_ID,Group_Name, Comment)"+"VALUES('"+profile_name+"','"+user_id+"','"+P_id+"','"+P_Commentid+"','"+Comment_id+"','"+G_name+"','"+Comment+"');";
 				     st.executeUpdate(sql1);
 					
 				 }
 				 
 				 } catch(Exception e){
-					 //response = "Record Inserted Successfully";
 					 //response = "Comments Record Already Present!";
+					 response = "Record Already Present!";
 					 System.out.println("Comments Record Already Present!");
 					 e.printStackTrace();
 				 }
