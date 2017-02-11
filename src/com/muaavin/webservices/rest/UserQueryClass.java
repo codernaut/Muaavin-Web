@@ -41,10 +41,10 @@ public class UserQueryClass {
 		Connection conn = db.connect();
 		Statement st = conn.createStatement();
 		ResultSet rs = null;
-		String sql = "select name as Name , id as User_ID, profilePic as Profile_pic ,state from users;";
+		String sql = "select name  , id , profilePic  ,state from users;";
 		rs = (ResultSet) st.executeQuery(sql);
 		getTwitterAndFacebookUsersFromDB(rs ,  false , false);
-		rs = (ResultSet) st.executeQuery("select distinct id as  User_ID, name as Name , profilePic as Profile_pic , state from twitterUsers ;");
+		rs = (ResultSet) st.executeQuery("select distinct id , name  , profilePic , state from twitterUsers ;");
 		getTwitterAndFacebookUsersFromDB(rs ,  false , true);
 		return AesEncryption.encrypt(infringing_users.toString());	
 	}
@@ -205,18 +205,18 @@ public class UserQueryClass {
 		
 		if(Group_name.equals("All"))
 		{ 
-			rs = (ResultSet) st.executeQuery("select distinct id as User_ID, name as Name, profilePic as Profile_pic, state from TwitterInfringingUsers;"); 
+			rs = (ResultSet) st.executeQuery("select distinct id , name , profilePic , state from TwitterInfringingUsers;"); 
 			getTwitterAndFacebookUsersFromDB(rs , false,true);
-			rs = (ResultSet) st.executeQuery("select distinct id as User_ID, name as Name, profilePic as Profile_pic, state from FacebookInfringingUsers;"); 
+			rs = (ResultSet) st.executeQuery("select distinct id , name ,  Profile_pic as profilePic , state from FacebookInfringingUsers;"); 
 			getTwitterAndFacebookUsersFromDB(rs , false,false);
 			System.out.print("Get All infringing Users Function Group Name : All");
 		}
 			
 		else
 		{
-			rs = (ResultSet) st.executeQuery("select distinct id as User_ID , name as Name, profilePic as Profile_pic, state from TwitterInfringingUsers where Group_Name = '"+Group_name+"';");
+			rs = (ResultSet) st.executeQuery("select distinct id  , name , profilePic , state from TwitterInfringingUsers where Group_Name = '"+Group_name+"';");
 			getTwitterAndFacebookUsersFromDB(rs , false,true);
-			rs = (ResultSet) st.executeQuery("select distinct id as User_ID , name as Name, profilePic as Profile_pic, state from FacebookInfringingUsers where Group_Name = '"+Group_name+"';");
+			rs = (ResultSet) st.executeQuery("select distinct id , name ,Profile_pic as profilePic  ,state from FacebookInfringingUsers where Group_Name = '"+Group_name+"';");
 			getTwitterAndFacebookUsersFromDB(rs , false,false);
 			System.out.print("Get All infringing Users Function Group Name : Specific");
 		}	
@@ -241,11 +241,11 @@ public class UserQueryClass {
 		{
 			if(Group_name.equals("All"))
 			{
-				rs = (ResultSet) st.executeQuery("select distinct(infringingUsers.User_ID) ,infringingUsers.Name, infringingUsers.Profile_pic ,infringingUsers.state from groupTable,infringingUsers where groupTable.id=infringingUsers.Group_ID and infringingUsers.state = 'UnBlocked' and infringingUsers.Profile_Name = '"+user_id+"';");
+				rs = (ResultSet) st.executeQuery(" select distinct id, name, Profile_pic as profilePic,state from FacebookInfringingUsers where state = 'UnBlocked' and User_ID = '"+user_id+"';");
 			}
 			else
 			{
-				rs = (ResultSet) st.executeQuery("select distinct(infringingUsers.User_ID), infringingUsers.Name,  infringingUsers.Profile_pic, infringingUsers.state  from groupTable,infringingUsers where groupTable.id=infringingUsers.Group_ID and infringingUsers.state = 'UnBlocked' and infringingUsers.Profile_Name ='"+user_id+"' and groupTable.name='"+Group_name+"';");
+				rs = (ResultSet) st.executeQuery(" select distinct id, name, Profile_pic as profilePic,state from FacebookInfringingUsers where state = 'UnBlocked' and User_ID = '"+user_id+"' and group_name='"+Group_name+"';");
 			}	
 		}
 		return rs;	
@@ -263,9 +263,8 @@ public class UserQueryClass {
 		}
 		else
 		{
-			// Delete from PostThumbDown Delete from post FeedBack 
-			st.executeUpdate("delete from commentsThumbDown where InfringingUserId = '"+UserID+"');");
-			st.executeUpdate("delete from commentFeedBack where InfringingUserId = '"+UserID+"');");
+			st.executeUpdate("delete from commentsThumbDown where InfringingUserId = '"+UserID+"';");
+			st.executeUpdate("delete from commentFeedBack where InfriningUserId = '"+UserID+"';");
 			st.executeUpdate("delete from PostTable where   InfringingUserId = '"+UserID+"';");	
 			st.executeUpdate("delete from comments where   InfringingUserId = '"+UserID+"';");	
 			st.executeUpdate("delete from infringingUsers where User_ID = '"+UserID+"';");
@@ -278,16 +277,8 @@ public class UserQueryClass {
 	{
 		while(rs.next())
 		{	
-			if(getTwitterData == true)
-			{
-				User user = User.initializeUser(rs.getString("name") ,rs.getString("id") , rs.getString("profilePic"),rs.getString("state"),true);
-				infringing_users.add(user);
-			}
-			else 
-			{
-				User user = User.initializeUser(rs.getString("Name") ,rs.getString("User_ID") , rs.getString("Profile_pic"),rs.getString("state"),twitterData);
-				infringing_users.add(user);
-			}
+			User user = User.initializeUser(rs.getString("name") ,rs.getString("id") , rs.getString("profilePic"),rs.getString("state"),twitterData);
+			infringing_users.add(user);
 		}
 	}	
 }

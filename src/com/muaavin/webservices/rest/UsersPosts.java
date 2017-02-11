@@ -45,8 +45,8 @@ public class UsersPosts {
 			 Post_List = getresultantDataFromDB(rs, true, new ArrayList<Post>(),false);
 			 rs = getUserPosts(Group_name, rs, st, user_id, TwitterUserID, false,true); //Get Reported Facebook Comments as Posts
 			 Post_List = getCommentDetailsFromDB(rs, false, Post_List,true);
-			 rs = getUserPosts(Group_name, rs, st, user_id, TwitterUserID, false,false); //Get Reported Facebook  Posts
-			 Post_List = getresultantDataFromDB(rs, false,Post_List,false ); 
+			 //rs = getUserPosts(Group_name, rs, st, user_id, TwitterUserID, false,false); //Get Reported Facebook  Posts
+			 //Post_List = getresultantDataFromDB(rs, false,Post_List,false ); 
 		}
 		else
 		{
@@ -54,8 +54,8 @@ public class UsersPosts {
 			 Post_List = getresultantDataFromDB(rs, true, new ArrayList<Post>(),false);
 			 rs =  getAllPosts(st, Group_name,false,true); 
 			 Post_List = getCommentDetailsFromDB(rs, false, Post_List,true);
-			 rs =  getAllPosts(st, Group_name,false,false); 
-			 Post_List = getresultantDataFromDB(rs, false,Post_List,false );
+			 //rs =  getAllPosts(st, Group_name,false,false); 
+			 //Post_List = getresultantDataFromDB(rs, false,Post_List,false );
 		}
 		return AesEncryption.encrypt(Post_List.toString());	
 	}
@@ -65,13 +65,13 @@ public class UsersPosts {
 		ResultSet rs = null;
 		if(IsTwitterData)
 		{
-			if(Group_name.equals("All")) { rs = (ResultSet) st.executeQuery("select distinct TweetID as id, message as post_Detail , ImageUrl as Post_Image from tweetTable;"); }
-			else{	rs = (ResultSet) st.executeQuery("select distinct TweetID as id , message as post_Detail , ImageUrl as Post_Image from tweetTable where Group_Name  = '"+Group_name+"';"); }
+			if(Group_name.equals("All")) { rs = (ResultSet) st.executeQuery("select distinct TweetID as id, message as post_Detail , ImageUrl as Post_Image,Infringing_User_ID  from tweetTable;"); }
+			else{	rs = (ResultSet) st.executeQuery("select distinct TweetID as id , message as post_Detail , ImageUrl as Post_Image,Infringing_User_ID from tweetTable where Group_Name  = '"+Group_name+"';"); }
 		}
 		else if(IsComment) 
 		{
-			if(Group_name.equals("All")) { rs = (ResultSet) st.executeQuery("select distinct  PostId as id, Parent_Comment_id, Comment_ID, Comment from  Comments;"); }
-			else { rs = (ResultSet) st.executeQuery("select distinct  PostId as id, Parent_Comment_id, Comment_ID, Comment from  Comments where   Group_Name  = '"+Group_name+"';"); }
+			if(Group_name.equals("All")) { rs = (ResultSet) st.executeQuery("select distinct  PostId as id, Parent_Comment_id, Comment_ID, Comment, InfringingUserId from  Comments;"); }
+			else { rs = (ResultSet) st.executeQuery("select distinct  PostId as id, Parent_Comment_id, Comment_ID, Comment, InfringingUserId from  Comments where   Group_Name  = '"+Group_name+"';"); }
 		}
 		else
 		{
@@ -85,13 +85,13 @@ public class UsersPosts {
 	{
 		if(IsTwitterData)
 		{
-			if(Group_name.equals("All")) { rs = (ResultSet) st.executeQuery("select distinct TweetID as id, message as post_Detail , ImageUrl as Post_Image from tweetTable where User_ID = '"+TwitterUserID+"';"); }			
-			else {	rs = (ResultSet) st.executeQuery("select distinct TweetID as id , message as post_Detail , ImageUrl as Post_Image from tweetTable where Group_Name  = '"+Group_name+"' and User_ID = '"+TwitterUserID+"';"); }
+			if(Group_name.equals("All")) { rs = (ResultSet) st.executeQuery("select distinct TweetID as id, message as post_Detail , ImageUrl as Post_Image ,Infringing_User_ID from tweetTable where User_ID = '"+TwitterUserID+"';"); }			
+			else {	rs = (ResultSet) st.executeQuery("select distinct TweetID as id , message as post_Detail , ImageUrl as Post_Image, Infringing_User_ID from tweetTable where Group_Name  = '"+Group_name+"' and User_ID = '"+TwitterUserID+"';"); }
 		}
 		else if(IsComment) 
 		{
-			if(Group_name.equals("All")) { rs = (ResultSet) st.executeQuery("select distinct  PostId as id, Parent_Comment_id, Comment_ID, Comment from  Comments where  User_ID = '"+user_id+"';"); }
-			else { rs = (ResultSet) st.executeQuery("select distinct  PostId as id, Parent_Comment_id, Comment_ID, Comment from  Comments where   Group_Name  = '"+Group_name+"'  and User_ID = '"+user_id+"';"); }
+			if(Group_name.equals("All")) { rs = (ResultSet) st.executeQuery("select distinct  PostId as id, Parent_Comment_id, Comment_ID, Comment , InfringingUserId  from  Comments where  User_ID = '"+user_id+"';"); }
+			else { rs = (ResultSet) st.executeQuery("select distinct  PostId as id, Parent_Comment_id, Comment_ID, Comment, InfringingUserId  from  Comments where   Group_Name  = '"+Group_name+"'  and User_ID = '"+user_id+"';"); }
 		}
 		else
 		{
@@ -109,7 +109,8 @@ public class UsersPosts {
 			  String post_detail = rs.getString("post_Detail");
 			  String post_id = rs.getString("id");
 			  String post_image = rs.getString("Post_Image");
-			  Posts.add(new Post(post_detail, post_id, post_image,IsTwitterPost,IsComment));  
+			  String InfringingUserId = rs.getString("Infringing_User_ID");
+			  Posts.add(new Post(post_detail, post_id, post_image,InfringingUserId,IsTwitterPost,IsComment));  
 			  System.out.print("post_detail :"+post_detail + " IsTwitterPost :"+IsTwitterPost);
 		 }
 		return Posts;
@@ -123,8 +124,9 @@ public class UsersPosts {
 			  String comment_id = rs.getString("Comment_ID"); 
 			  String Parent_Comment_id = rs.getString("Parent_Comment_id");
 			  String post_id = rs.getString("id")+"-"+Parent_Comment_id+"-"+comment_id;
-			  String Comment = rs.getString("Comment");			  
-			  Posts.add(new Post(Comment, post_id, "",IsTwitterPost,IsComment));  
+			  String Comment = rs.getString("Comment");	
+			  String InfringingUserId = rs.getString("InfringingUserId");
+			  Posts.add(new Post(Comment, post_id, "",InfringingUserId,IsTwitterPost,IsComment));  
 		 }
 		return Posts;
 	}

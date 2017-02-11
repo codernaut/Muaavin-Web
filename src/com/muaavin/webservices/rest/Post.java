@@ -71,7 +71,7 @@ public class Post {
 		
     } 
 	
-	public Post( String post_detail , String post_id, String post_image, boolean isTwitterPost, boolean isComment) {
+	public Post( String post_detail , String post_id, String post_image,String InfringingUserId, boolean isTwitterPost, boolean isComment) {
 		
 		Post_Detail = post_detail;	
 		Post_ID = post_id;
@@ -79,6 +79,7 @@ public class Post {
 		Post_Image = post_image;
 		IsTwitterPost = isTwitterPost;
 		IsComment = isComment;
+		infringingUserId = InfringingUserId;
 		
     } 
 	
@@ -111,6 +112,7 @@ public class Post {
 	        		 jobj = new JSONObject().put("Post_Detail", Post_Detail);
 	        		 jobj.put("Post_ID", Post_ID);
 	        		 jobj.put("Post_Image", Post_Image);
+	        		 jobj.put("infringingUserId", infringingUserId);
 	        		 jobj.put("IsTwitterPost", IsTwitterPost);
 	        		 jobj.put("IsComment", IsComment);
 	        	}
