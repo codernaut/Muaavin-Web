@@ -6,11 +6,13 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+
 
 
 
@@ -31,7 +33,7 @@ public class UserQueryClass {
 	List<User> users = new ArrayList<>();
 	List<User> infringing_users = new ArrayList<>();
 	
-	@POST
+	@GET
 	@Path("/GetUsers")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getUsers() throws Exception
@@ -49,7 +51,7 @@ public class UserQueryClass {
 		return AesEncryption.encrypt(infringing_users.toString());	
 	}
 	
-	@POST
+	@GET
 	@Path("/BlockUser")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String BlockUser(@QueryParam("user_id") String user_id, @QueryParam("isTwitterUser") boolean isTwitterUser) throws Exception
@@ -98,7 +100,7 @@ public class UserQueryClass {
 		return users;
 	}
 	
-	@POST
+	@GET
 	@Path("/checkIfUserBlocked")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String checkIfUserIsAlreadyBlocked(@QueryParam("user_id") String user_id) throws Exception
@@ -115,7 +117,7 @@ public class UserQueryClass {
 		return AesEncryption.encrypt("User not Blocked");
 	}
 	
-	@POST
+	@GET
 	@Path("/getBlockedUsers")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getBlockedUsers() throws Exception
@@ -132,7 +134,7 @@ public class UserQueryClass {
 		//String JsonResponseUsers = getBlockedUsersList(rs,new ArrayList<User>(),false).toString();
 		return AesEncryption.encrypt(Users.toString());
 	}
-	@POST
+	@GET
 	@Path("/UnBlockUser")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String UnBlockUser(@QueryParam("user_id") String user_id, @QueryParam("isTwitterUser") boolean isTwitterUser) throws Exception
@@ -155,7 +157,7 @@ public class UserQueryClass {
 		}
 	}
 	////////////////////////////////////////////////////////////////////////////
-	@POST
+	@GET
 	@Path("/Highlights")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String get_InfringingUsers(@QueryParam("name") String Group_name ,@QueryParam("user_id") String user_id ,@QueryParam("specificUserFriends") boolean specificUserFriends , @QueryParam("isTwitterData") boolean getTwitterData) throws Exception
@@ -186,7 +188,7 @@ public class UserQueryClass {
 		return AesEncryption.encrypt(infringing_users.toString());
 	}
 	
-	@POST
+	@GET
 	@Path("/UnReportUser")
 	@Produces(MediaType.APPLICATION_JSON)
 	public void UnReportUsers(@QueryParam("user_id") String User_ID,@QueryParam("isTwitterData") boolean isTwitterData) throws Exception

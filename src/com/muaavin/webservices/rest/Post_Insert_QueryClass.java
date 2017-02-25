@@ -32,10 +32,10 @@ public class Post_Insert_QueryClass {
 
 
 	
-	@POST
+	@GET
 	@Path("/Insert_Post")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String Insert_Posts(@QueryParam("user_name") String user_name,@QueryParam("UserState") String user_state,@QueryParam("ReportedUserState") String reportedUserState,@QueryParam("Post_id") String P_id,@QueryParam("Group_id") String G_id,@QueryParam("Comment_id") String Comment_id,@QueryParam("PComment_id") String P_Commentid,@QueryParam("Group_name") String G_name , @QueryParam("Profile_name") String profile_name,@QueryParam("user_id") String user_id, @QueryParam("infringing user_name") String infringinguser_name, @QueryParam("Post_image") String Post_image, @QueryParam("userProfilePic") String userProfilePic,@QueryParam("infringingUser_ProfilePic") String infringingUser_ProfilePic,@QueryParam("Comment") String Comment, @QueryParam("Post_Det") String Post_Det) throws Exception
+	public String Insert_Posts(@QueryParam("user_name") String user_name,@QueryParam("UserState") String user_state,@QueryParam("ReportedUserState") String reportedUserState,@QueryParam("Post_id") String P_id,@QueryParam("Group_id") String G_id,@QueryParam("Comment_id") String Comment_id,@QueryParam("PComment_id") String P_Commentid,@QueryParam("Group_name") String G_name , @QueryParam("Profile_name") String profile_name,@QueryParam("user_id") String user_id, @QueryParam("infringing_user_name") String infringinguser_name, @QueryParam("Post_image") String Post_image, @QueryParam("userProfilePic") String userProfilePic,@QueryParam("infringingUser_ProfilePic") String infringingUser_ProfilePic,@QueryParam("Comment") String Comment, @QueryParam("Post_Det") String Post_Det) throws Exception
 	{
 		System.out.println("infringinguser_name "+infringinguser_name);
 		user_state = AesEncryption.decrypt(user_state);

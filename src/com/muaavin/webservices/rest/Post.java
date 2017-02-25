@@ -120,11 +120,8 @@ public class Post {
 	        	
 	        return  jobj.toString();//JSONObject().put("Post_ID", Post_ID).put("Post_Detail", Post_Detail).toString();
 	        } 
-	        catch (JSONException e) 
-	        {
-	            return null;
-	        }
-	        
+	        catch (JSONException e) {  return null; }
+  
 	 	}
 	 
 	 

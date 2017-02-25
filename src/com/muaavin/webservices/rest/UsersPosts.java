@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -23,7 +24,7 @@ public class UsersPosts {
 	List<Post> Post_List = new ArrayList<>();
 	boolean isPostOfSpecificUser;
 	
-	@POST
+	@GET
 	@Path("/GetUsersPosts")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getUsersPosts(@QueryParam("name") String Group_name,@QueryParam("user_id") String user_id,@QueryParam("isSpecificUserPost") boolean isPostOfSpecificUser, @QueryParam("TwitterUserID") String TwitterUserID) throws Exception

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -18,12 +19,11 @@ public class ThumbsDown {
 	ResultSet rs;
 	String[] idArray;
 
-	@POST
+	@GET
 	@Path("/Add_ThumbsDown")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String Add_ThumbsDown(@QueryParam("user_id") String user_id, @QueryParam("post_id") String post_id, @QueryParam("InfringingUserId") String InfringingUserId, @QueryParam("IsTwitterPost") boolean IsTwitterPost, @QueryParam("IsComment") boolean IsComment ) throws Exception
 	{
-		
 		user_id = AesEncryption.decrypt(user_id);
 		post_id = AesEncryption.decrypt(post_id);
 		if(InfringingUserId!= null) { InfringingUserId = AesEncryption.decrypt(InfringingUserId); }

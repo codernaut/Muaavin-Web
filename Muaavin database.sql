@@ -12,28 +12,6 @@ create table CommentsThumbDown(post_id varchar(100) not null, commentId varchar(
 create table PostFeedBack(id int unsigned auto_increment primary key not null, post_id varchar(100) not null, user_id varchar(100) not null, comment varchar(2000));
 create table CommentFeedBack(id int unsigned auto_increment primary key not null, post_id varchar(100) not null, Pcommentid varchar(100) , Comment_id varchar(100) not null, user_id varchar(100) not null, InfriningUserId varchar(100) not null, comment varchar(2000));
 
-
-CREATE VIEW Group_A AS
-select distinct postTable.id, Comments.Parent_Comment_id, Comments.Comment_ID, infringingUsers.Name,infringingUsers.Profile_pic,postTable.Post_Image,Comments.Comment, postTable.post_Detail
-from postTable, Comments, infringingUsers, Posts_Comments_Table
-where postTable.id=Posts_Comments_Table.Post_ID and Posts_Comments_Table.Comment_ID = Comments.Comment_ID and infringingUsers.Comment_ID = Comments.Comment_ID and Comments.Group_Name = 'A';
-
-CREATE VIEW Group_B AS
-select distinct postTable.id, Comments.Parent_Comment_id, Comments.Comment_ID, infringingUsers.Name,infringingUsers.Profile_pic,postTable.Post_Image,Comments.Comment, postTable.post_Detail
-from postTable, Comments, infringingUsers, Posts_Comments_Table
-where postTable.id=Posts_Comments_Table.Post_ID and Posts_Comments_Table.Comment_ID = Comments.Comment_ID and infringingUsers.Comment_ID = Comments.Comment_ID and Comments.Group_Name = 'B';
-
-
-CREATE VIEW Group_C AS
-select distinct postTable.id, Comments.Parent_Comment_id, Comments.Comment_ID, infringingUsers.Name,infringingUsers.Profile_pic,postTable.Post_Image,Comments.Comment, postTable.post_Detail
-from postTable, Comments, infringingUsers, Posts_Comments_Table
-where postTable.id=Posts_Comments_Table.Post_ID and Posts_Comments_Table.Comment_ID = Comments.Comment_ID and infringingUsers.Comment_ID = Comments.Comment_ID and Comments.Group_Name = 'C';
-
-CREATE VIEW Group_All AS
-select distinct postTable.id, Comments.Parent_Comment_id, Comments.Comment_ID, infringingUsers.Name,infringingUsers.Profile_pic,postTable.Post_Image,Comments.Comment, postTable.post_Detail
-from postTable, Comments, infringingUsers, Posts_Comments_Table
-where postTable.id=Posts_Comments_Table.Post_ID and Posts_Comments_Table.Comment_ID = Comments.Comment_ID and infringingUsers.Comment_ID = Comments.Comment_ID and Comments.Group_Name = postTable.group_name;
-
 CREATE VIEW ThumbsDown_View AS
 select ThumbsDown.post_id, count(*) AS  total_Unlikes
 from ThumbsDown
