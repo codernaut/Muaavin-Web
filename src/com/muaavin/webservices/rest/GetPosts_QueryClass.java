@@ -22,7 +22,7 @@ public class GetPosts_QueryClass {
 	List<Post> Post_List = new ArrayList<>();
 	String[] idArray;
 
-	@POST
+	@GET
 	@Path("/GetPosts")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String get_InfringingUsers(@QueryParam("name") String Group_name) throws Exception
@@ -92,7 +92,7 @@ public class GetPosts_QueryClass {
 		
 	}
 	
-	@POST
+	@GET
 	@Path("/DeletePosts")
 	@Produces(MediaType.APPLICATION_JSON)
 	public void deletePosts(@QueryParam("Post_id") String Post_id, @QueryParam("Group_name") String group_name, @QueryParam("User_id") String user_id, @QueryParam("isPostOfSpecificUser") boolean isPostOfSpecificUser,@QueryParam("InfringingUserID") String InfringingUserID,@QueryParam("IsTwitterPost") boolean IsTwitterPost ,@QueryParam("IsComment") boolean IsComment) throws Exception

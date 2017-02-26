@@ -3,6 +3,7 @@ package com.muaavin.webservices.rest;
 import java.sql.Connection;
 import java.sql.Statement;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -16,7 +17,7 @@ public class User_FeedBack {
 	
 	String[] idArray;
 
-	@POST
+	@GET
 	@Path("/Add_FeedBack")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String Add_FeedBack(@QueryParam("user_id") String user_id, @QueryParam("InfringingUserId") String InfringingUserId,@QueryParam("post_id") String post_id,@QueryParam("comment") String comment ,@QueryParam("IsTwitterFeedBack") boolean IsTwitterFeedBack ,@QueryParam("IsComment") boolean IsComment) throws Exception

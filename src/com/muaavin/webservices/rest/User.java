@@ -47,10 +47,8 @@ public class User {
 	     {	         
 	        return new JSONObject().put("User_Name", User_Name).put("User_ID", User_ID).put("Profile_Pic", Profile_Pic).put("State", State).put("IsTwitterUser", IsTwitterUser).toString();
 	     } 
-	     catch (JSONException e) 
-	     {
-	        return null;
-	     }
+	     catch (JSONException e) { return null; }
+	     
 	  }
 	 
 	 public static User initializeUser(String Name ,String user_id , String profile_pic, String State,boolean isTwitteruser )

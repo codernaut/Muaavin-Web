@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -17,7 +18,7 @@ public class TweetQuery {
 
 	boolean recordPresent ;
 	public String Response;
-	@POST
+	@GET
 	@Path("/AddTweet")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String addTweet(@QueryParam("User_ID") String user_id,@QueryParam("User_Name") String user_name,@QueryParam("User_ImageUrl") String userProfilePic,@QueryParam("Tweet_ID") String tweet_id, @QueryParam("Message") String message, @QueryParam("ImageUrl") String imageURL,@QueryParam("Group_Name") String group_name, @QueryParam("InfringingUserID") String infringingUser_id, @QueryParam("InfringingUserName") String infringingUserName,@QueryParam("InfringingUserProfilePic") String infringingUserProfilePic  ) throws Exception
