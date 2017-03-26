@@ -59,7 +59,8 @@ public class Post_Insert_QueryClass {
 		System.out.println("infringinguser_name "+infringinguser_name);
 		MySqlDb Db = new MySqlDb();
 		String response = "";
-		try{
+		try
+		{
 			 Connection conn = Db.connect();
 			 Statement st = conn.createStatement();
 			 
@@ -71,18 +72,20 @@ public class Post_Insert_QueryClass {
 			System.out.print("P_id "+P_id+" G_id "+G_id+" Gname "+G_name+" Profile name "+profile_name + " User ID "+user_id+ " Comment_id "+Comment_id+" Parent Comment_id "+P_Commentid+" Post Detail "+Post_Det+" Post image " + Post_image+" User State " + user_state+" InfringingUserState  " +reportedUserState/*+ " infringing user profile pic " + infringingUser_ProfilePic*/);
 			
 			 
-			try{
+			try
+			{
 				int count = 0;
 				{
 					String sql = "select * from infringingUsers where User_ID = '"+user_id+"';";	
 					rs = (ResultSet) st.executeQuery(sql);
 					
-					while(rs.next()) { 
+					while(rs.next()) 
+					{ 
 						 
 					   count = count+1; break;	
 					   				  
-					 }
-				 }	
+					}
+				}	
 			if(count ==  0)
 			{
 			 String sql = "INSERT INTO infringingUsers(User_ID,Profile_pic, Name, state) VALUES ('"+user_id+"','"+infringingUser_ProfilePic+"','"+infringinguser_name+"','"+reportedUserState+"');";
@@ -97,42 +100,48 @@ public class Post_Insert_QueryClass {
 				e.printStackTrace();
 			}
 	
-			try{
+			try
+			{
 				
 				int count = 0;
 				{
 				String sql = "select * from Users where id = '"+profile_name+"';";	
 				rs = (ResultSet) st.executeQuery(sql);
 				
-				while(rs.next()) { 
+					while(rs.next()) 
+					{ 
 					 
-				   count = count + 1; //User_ID
-				   break;
-				 }
+						count = count + 1; //User_ID
+						break;
+					}
 				}
 						
 				if(count == 0)	
 				{
-				 String sql = "INSERT INTO Users(id, name, profilePic, state) VALUES('"+profile_name+"','"+user_name+"','"+userProfilePic+"','"+user_state+"');";  
-				 st.executeUpdate(sql);
+					String sql = "INSERT INTO Users(id, name, profilePic, state) VALUES('"+profile_name+"','"+user_name+"','"+userProfilePic+"','"+user_state+"');";  
+					st.executeUpdate(sql);
 				}
 				 
 			     
-				 } catch(Exception e){
+			} 
+			catch(Exception e)
+			{
 					 //response = "Record Inserted Successfully";
 					 response = "Users Record Already Present!";
 					 System.out.println("Users record already Present");
 					 e.printStackTrace();
-				 }
+			}
 			
 			
-			 try{
+			 try
+			 {
 				 ///////////////////////
 				 int count = 0;
 				 String sql = "select * from postTable where id = '"+P_id+"' and group_name = '"+G_name+"' and User_ID = '"+profile_name+"' and InfringingUserID = '"+user_id+"';";
 				 rs = (ResultSet) st.executeQuery(sql);
 				 
-				 while(rs.next()) { 
+				 while(rs.next()) 
+				 { 
 					 
 				   count = count+1; //User_ID
 				 }

@@ -50,7 +50,7 @@ public class TweetQuery {
 		////
 		rs = (ResultSet) st.executeQuery("select id  from twitterUsers where id = '"+ user_id+"' ;");
 		while(rs.next()) { recordPresent = true; System.out.println("User Already Present :"+ recordPresent); }
-		if(!recordPresent) {st.executeUpdate("INSERT INTO TwitterUsers( id,  name, profilePic,state) VALUES ('"+user_id+"','"+user_name+"','"+imageURL+"','"+"UnBlocked');");  Response = "Report sent successfully"; }
+		if(!recordPresent) {st.executeUpdate("INSERT INTO TwitterUsers( id,  name, profilePic,state) VALUES ('"+user_id+"','"+user_name+"','"+userProfilePic+"','"+"UnBlocked');");  Response = "Report sent successfully"; }
 		recordPresent = false;
 		////
 		

@@ -35,7 +35,7 @@ public class User_FeedBack {
 		
 		else { st.executeUpdate("INSERT INTO PostFeedBack(user_id,  post_id, comment) VALUES ('"+user_id+"','"+post_id+"','"+comment+"');"); }
 		
-		return AesEncryption.encrypt("Feedback successfully sent");
+		return AesEncryption.encrypt(comment);
 		
 	}
 }
