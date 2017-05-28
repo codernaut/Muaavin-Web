@@ -1,6 +1,7 @@
 package com.muaavin.webservices.rest;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import com.muaavin.webservices.rest.AesEncryption;
-import com.mysql.jdbc.ResultSet;
+
 
 
 @Path("/posts") 

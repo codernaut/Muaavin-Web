@@ -15,7 +15,7 @@ import javax.ws.rs.core.MediaType;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.mysql.jdbc.ResultSet;
+
 
 @Path("/Query") 
 public class QueryClass {

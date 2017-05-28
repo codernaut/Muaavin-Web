@@ -1,6 +1,7 @@
 package com.muaavin.webservices.rest;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import com.mysql.jdbc.ResultSet;
+
 
 @Path("/Posts_Query")
 public class GetPosts_QueryClass {

@@ -13,7 +13,7 @@ public class MySqlDb {
 
 	//  Database credentials
 	static final String USER = "root";
-	static final String PASS = "Lmkr@123";
+	static final String PASS = "root";
 
 
 	
